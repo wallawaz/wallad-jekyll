@@ -8,10 +8,10 @@
 # Site settings
 title: My Website
 email: bwallad@gmail.com
-description: I will be using this as I place to share my personal thoughts and projects
+description: Personal thoughts and projects
 
 #baseurl: "/blog" # the subpath of your site, e.g. /blog
-#url: "http://yourdomain.com" # the base hostname & protocol for your site
+url: "http://benwallad.com" # the base hostname & protocol for your site
 twitter_username: mrbino
 github_username:  wallawaz
 

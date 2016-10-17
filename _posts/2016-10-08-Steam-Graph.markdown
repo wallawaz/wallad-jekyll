@@ -6,18 +6,18 @@ date: 2016-10-08
 
 
 <div class="post-link">
-  <a href="http://benwallad.com/steam">tldr: View Chart</a>
+  <a href="http://benwallad.com:8000/steam">tldr: View Chart</a>
 </div>
 <br />
-I've been intruiged with [D3](https://d3js.org/) for a while now, toying with its powerful charting applications. Since I enjoy keeping up gaming trends I thought it would be cool to use D3 to chart the most popular current games grouped by genre. With this grouping, we can clearly see if say *sports* or *action* games are currently more popular. Since [steam](http://store.steampowered.com) dominates the PC gaming market, I decided that the most popular games currently being being played on steam would be be be the basis of my project.
+I've been intruiged with [D3](https://d3js.org/) for a while now, toying with its powerful charting applications. Since I enjoy keeping up with gaming trends I thought it would be cool to use D3 to chart the most popular current games grouped by genre. By aggregating the data by genre, we can clearly see which genres are most popular. Since [steam](http://store.steampowered.com) dominates the PC gaming market, I decided that the most popular games currently being played on steam would be the basis of my project.
 
-Steam itself does disclose top games by player count, but only for its top 100 games. I wanted to include more than 100 games in my calculation so I looked elsewhere for steam player stats.
+Steam itself does disclose top games by player count, but only for its top 100 games. I wanted to include more than 100 games in my calculation, so I looked elsewhere for steam player stats.
 I ended up finding the website [steamdb](https://steamdb.info/), which has a wealth of information on all steam titles.
-Paricularly, their "/graph" endpoint contains the "Top games by current player count" which contains the current player count for over 7,000 games on steam. This is exactly what I was looking for. Additionally, steamdb lists each game's *APPID* which was a key datapoint for obtaining more data for each title.
+In particular, their */graph* endpoint contains the "Top games by current player count" which contains the current player count for over 7,000 games on steam. This is exactly what I was looking for. Additionally, steamdb lists each game's *APPID* which was a key datapoint for obtaining more data for each title.
 
-Using [Requests](http://docs.python-requests.org/en/master/) and [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/) I wrote a scraper that grabs *APPID* and *player_count* stats from this page and updates a SQLite database with this info.
+Using [Requests](http://docs.python-requests.org/en/master/) and [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/), I wrote a scraper that grabs *APPID* and *player_count* stats from this page and updates a SQLite database with this info.
 
-Next, I needed to grab the genres that each of these *APPIDS* belong to in order to rank the most popular genres. The Steam API [endpoint](http://store.steampowered.com/), returns all relevant game metadata given an *APPID* parameter. Thus, I expanded my scraper to get the genres for each *APPID* from the Steam API. The Steam API is rate-limited, this also needed to be considered in order to adhere to steam's acceptible terms of use.
+Next, I needed to grab the genres that each of these *APPIDS* belong to in order to rank the most popular genres. The Steam API [endpoint](http://store.steampowered.com/) returns all relevant game metadata given an *APPID* parameter. Thus, I expanded my scraper to get the genres for each *APPID* from the Steam API. The Steam API is rate-limited, thus I  needed to delay my requests to the acceptible threshold in order to adhere to steam's acceptible terms of use.
 
 ---
 <br />
@@ -142,7 +142,8 @@ With the top_games response, I then loaded these 10 elements within the JSON res
 
 ---
 <br />
-Finally, I thought it would be cool to be able to dynamically load a specific game's metadata on the page,  however I did not want to have to store all steam metadata within the application. So, I created another endpoint to ping the steam api for a given steam_id as needed after page load.
+Finally, I thought it would be cool to be able to dynamically load a specific game's metadata on the page. However I did not want to have to store all steam metadata within the application. So, I created another endpoint to ping the steam api for a given steam_id as needed after page load.
+
 ```python
 
     @app.route("/details/<id>")
@@ -216,7 +217,7 @@ With a successful response, elements within the main page are then loaded with m
 ```
 <br />
 
-Overall, I enjoyed working with D3 in this project. I like the concept of **binding** your data to a DOM selection, so you always know that a particular element is tied to a given dataset. Additionally, after data has been bound to the selection, futher attributes of the selection can be definied with the bound data through annonymous functions. For example, the height of each bar is defined by applying the yScale to the value of each data element in the selection:
+Overall, I enjoyed working with D3 in this project. I like the concept of **binding** your data to a DOM selection, so you always know that a particular element is tied to a given dataset. Additionally, after data has been bound to the selection, futher attributes of the selection can be defined with the bound data through annonymous functions. For example, the height of each bar is defined by applying the yScale to the value of each data element in the selection:
 ```javascript
 
        .attr("height", function(d) {
@@ -229,5 +230,5 @@ Overall, I enjoyed working with D3 in this project. I like the concept of **bind
 
 All source code is posted on [github](https://github.com/wallawaz/steam_graph) if you would like to view more.
 
-[Steam genre popularity](http://benwallad.com/steam)
+[Steam genre popularity](http://benwallad.com:8000/steam)
 
