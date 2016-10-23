@@ -6,7 +6,7 @@ date: 2016-10-08
 
 
 <div class="post-link">
-  <a href="http://benwallad.com:8000/steam">tldr: View Chart</a>
+  <a href="http://benwallad.com/steam">tldr: View Chart</a>
 </div>
 <br />
 I've been intruiged with [D3](https://d3js.org/) for a while now, toying with its powerful charting applications. Since I enjoy keeping up with gaming trends I thought it would be cool to use D3 to chart the most popular current games grouped by genre. By aggregating the data by genre, we can clearly see which genres are most popular. Since [steam](http://store.steampowered.com) dominates the PC gaming market, I decided that the most popular games currently being played on steam would be the basis of my project.
@@ -230,5 +230,5 @@ Overall, I enjoyed working with D3 in this project. I like the concept of **bind
 
 All source code is posted on [github](https://github.com/wallawaz/steam_graph) if you would like to view more.
 
-[Steam genre popularity](http://benwallad.com:8000/steam)
+[Steam genre popularity](http://benwallad.com/steam)
 
