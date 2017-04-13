@@ -1,6 +1,6 @@
 ---
 layout: post
-title: X-Files
+title: The Truth is out There...in the Data.
 date: 2017-04-12
 ---
 
@@ -17,10 +17,10 @@ Surely the consenus of viewers must also have felt the same way.
 
 <br />
 
-After watching hours and hours of campy sci-fi I wanted quality metrics on the show. The X-Files often featured guest writers and directors which caused the pace of the show to vary immensely. How did this variation in writers effect the quality of the show?
-My initial questions I attempted to answer were the following:
+After watching hours and hours of campy sci-fi, I wanted quality metrics on the show. The X-Files often featured guest writers and directors which caused the pace of the show to vary immensely. How did this variation in writers impact the quality of the show?
+The initial questions that I attempted to answer were the following:
 * Which season of The X-Files had the hightest rating?
-* Did the "Monster of the Week" standalone episodes perform better or worse then episodes based within the show's overall narrative?
+* Were "Monster of the Week" standalone episodes received better or worse than episodes based within the show's overall narrative?
 * Which writer of The X-Files wrote episodes with the highest ratings?
 
 
@@ -32,10 +32,10 @@ In order to answer these questions I needed data on each episode. I used Wikidat
 Effectively, Wikidata is an indexing system that exposes this knowledge base through various APIs.
 
 To grab data from Wikidata, I used the SPARQL query language.
-This was my first time using SPARQL but will not be my last. The syntax is still somewhat cryptic, however it provides access to a wealth of freely available data.
+This was my first time using SPARQL, but will not be my last. The syntax is still somewhat cryptic, however it provides access to a wealth of freely available data.
 In SPARQL, variables are assigned following the `SELECT` statement with `?`.
 
-In the following query, I am defining 9 variables to be extracted from **Wikidata: Entity Q2744**.
+In the following query, I am defining 9 variables to be extracted from The Wikidata entity for the X-Files [Q2744](https://www.wikidata.org/wiki/Q2744).
 ```sql
 PREFIX wikibase: <http://wikiba.se/ontology#>
 PREFIX schema: <http://schema.org/>
@@ -74,7 +74,7 @@ Variables are defined in the `WHERE` clause by binding them with schema P(Proper
 * The imdb variable is defined as **IMDb ID**(P345) of each episode.
 
 
-Results were limited to only include english language results with the `FILTER` clause.
+Results were limited to only include English language results with the `FILTER` clause.
 <br />
 
 With the SPARQL query ready; data was extracted from the SPARQL endpoint via a `GET` request.
@@ -150,7 +150,7 @@ df["is_monster_of_the_week"] = df["wikipedia"].map(
     lambda x: is_monster_of_the_week(get_content(get_episode_soup(x)))
 )
 ```
-Next, for quality metrics on each episode, I turned to imdb. The **imdb_id** previously pulled integreted well with the python omdb package.
+Next, for quality metrics on each episode, I turned to imdb. The **imdb_id** previously pulled integreted well with the [omdb package](https://pypi.python.org/pypi/omdb).
 ```python
 def imdb_data(row):
     """Fetch imdb data with the imdb_id from each row
@@ -164,7 +164,7 @@ def imdb_data(row):
     time.sleep(1)
     return row
 ```
-With enough muning, I was ready to start analyzing the data:
+With enough munging, I was ready to start analyzing the data.
 
 I began by aggregating the imdb metrics on a per season basis and plotting them side by side as a line chart using Bokeh:
 ```python
@@ -202,11 +202,14 @@ plot.multi_line(
 )
 show(plot)
 ```
-![season-popularity]({{ site.url }}/assets/x-files-season-popularity.png)
 
-X-Files viewers seem to enjoy the first three seasons the most, with a sharp drop in season 5.
-<br />
-Next, onto "Monster-of-the-Week".
+{: .archiveIntro}
+![season-popularity]({{ site.url }}/assets/x-files-season-popularity.png){:height="500px" width="600px"}
+
+X-Files viewers seem to enjoy the first three seasons the most, with a sharp drop at season 5.
+
+Next, I began classifying the show by the "Monster of Week" attribute I defined earlier.
+
 ```python
 # First, by season
 df_monster_by_season = df.groupby(["season", "is_monster_of_the_week"]).apply(len).reset_index()
@@ -219,7 +222,6 @@ df_monster_total = df.groupby(["is_monster_of_the_week"]).agg({
 df_monster_total.columns = ["monster_of_the_week", "imdb_rating", "count"]
 df_monster_total.head()
 ```
-
 <div>
 <table border="1">
  <thead>
@@ -246,16 +248,21 @@ df_monster_total.head()
  </tbody>
 </table>
 </div>
+<br />
+IMBD Reviewers on average reviewed Non Monster-of-the-Week episodes **~0.65** stars higher than their counter parts.
+
 ![monster-per-season]({{ site.url }}/assets/x-files-monster-per-season.png)
 ![monster-total]({{ site.url }}/assets/x-files-monster-total.png)
 ![monster-avg]({{ site.url }}/assets/x-files-monster-avg.png)
 
-Reviews on average reviewed Non Monster-of-the-Week episodes **~0.65** stars higher than their counter parts.
+Episodes centered on the overall narrative of the show were on average received better!
+<br />
 
-Finally, as I had to do a bit more cleansing with the _writer_ data. Since multiple writers can be credited on a single
-episode, the dataset's records needed to be spread to a `episodeID, writer` basis. With the `writer_cleaned` column stored as a list,
-I used the `apply` method to append each episode and writer pair to a new dataframe:
+Finally, I had to do a bit more cleansing with the _writer_ data to correctly perform metrics based on a writer.
+Since multiple writers can be credited on a single episode, the dataset's records needed to be spread to a `episode|writer` basis.
+With the `writer_cleaned` column stored as a list, I used the pandas `apply` method to append each episode|writer record to a new dataframe:
 ```python
+# only keeping these columns
 cols = [
     "imdb_votes",
     "imdb_rating",
@@ -263,23 +270,84 @@ cols = [
     "episodeID",
 ]
 rows = []
-_ = df.apply(lambda row: [rows.append([row[c] for c in cols] + [w]) 
+_ = df.apply(lambda row: [rows.append([row[c] for c in cols] + [w])
                          for w in row["writer_cleaned"]], axis=1)
 df_new = pd.DataFrame(rows, columns=cols + ["writer"])
 ```
 
 This new dataset was then aggreated to find the total number of episodes per writer and the average imdb_rating per writer.
+```python
+df_writer = df_new.groupby("writer").agg({
+    "episodeID": len,
+    "imdb_votes": np.sum,
+    "imdb_rating": np.mean,
+}).reset_index()
+df_writer.rename(columns={"episodeID":"episodes"}, inplace=True)
+df_writer.sort("episodes", ascending=False, inplace=True)
+df_writer.head()
+```
+<div>
+ <table border="1">
+   <thead>
+     <tr style="text-align: right;">
+       <th></th>
+       <th>writer</th>
+       <th>imdb_rating</th>
+       <th>imdb_votes</th>
+       <th>episodes</th>
+     </tr>
+   </thead>
+   <tbody>
+     <tr>
+       <th>5</th>
+       <td>Chris Carter</td>
+       <td>8.066341</td>
+       <td>392672.0</td>
+       <td>205</td>
+     </tr>
+     <tr>
+       <th>13</th>
+       <td>Frank Spotnitz</td>
+       <td>8.306818</td>
+       <td>68265.0</td>
+       <td>44</td>
+     </tr>
+     <tr>
+       <th>43</th>
+       <td>Vince Gilligan</td>
+       <td>8.425000</td>
+       <td>48820.0</td>
+       <td>28</td>
+     </tr>
+     <tr>
+       <th>23</th>
+       <td>John Shiban</td>
+       <td>7.904545</td>
+       <td>34321.0</td>
+       <td>22</td>
+     </tr>
+     <tr>
+       <th>17</th>
+       <td>Howard Gordon</td>
+       <td>7.645000</td>
+       <td>41683.0</td>
+       <td>20</td>
+     </tr>
+   </tbody>
+ </table>
+</div>
+<p>
+</p>
+* 👏 👏 👏 Chris Carter with 205 writing credits and an average imdb rating of 8.066341.
 
-* 👏 👏 Chris Carter with 205 writing credits and an average imdb rating of 8.066341.
-* Hmm, Stephen King and William Gibson wrote X-Files episodes.
+![writer-total]({{ site.url }}/assets/x-files-writer-total2.png){:height="500px" width="1200px"}
 <br />
 
-
-![writer-total]({{ site.url }}/assets/x-files-writer-total.png)
-![writer-avg]({{ site.url }}/assets/x-files-writer-avg.png)
+![writer-avg]({{ site.url }}/assets/x-files-writer-avg2.png){:height="500px" width="1200px"}
 
 
+* Darin Morgan was the most well recieved writer from X-Files. He wrote 7 episodes with an average rating of 8.9000.
+* Woah, Stephen King and William Gibson wrote X-Files episodes?!
 
-#XXX Conclusion...
 
-<sub>The full ipython notebook with all function defintions is available [here](https://github.com/wallawaz/watson_debates)</sub>
+<sub>The full ipython notebook with all function defintions is available [here](https://github.com/wallawaz/X-Files-Analysis/blob/master/xfiles-sparql.ipynb)</sub>
