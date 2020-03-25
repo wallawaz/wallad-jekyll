@@ -11,7 +11,7 @@ email: bwallad@gmail.com
 description: Personal thoughts and projects
 
 #baseurl: "/blog" # the subpath of your site, e.g. /blog
-url: "http://benwallad.com" # the base hostname & protocol for your site
+url: "https://benwallad.com" # the base hostname & protocol for your site
 twitter_username: mrbino
 github_username:  wallawaz
 
