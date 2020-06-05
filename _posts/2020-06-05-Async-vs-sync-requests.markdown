@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Async network requests with aiohttp
-date: 2020-06-04
+date: 2020-06-05
 ---
 
 A current project I am working on requires obtaining data from similar companies within the same market for analysis.
