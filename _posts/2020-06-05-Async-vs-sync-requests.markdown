@@ -7,7 +7,7 @@ date: 2020-06-05
 A current project I am working on requires obtaining data from similar companies within the same market for analysis.
 Since most of these entities do not provide an API, the only means I had to fetch data was to build scrapers.
 
-While building these scrapers, I first went to the ever popular [Requests](https://2.python-requests.org/en/master/) library out of habbit.
+While building these scrapers, I first went to the ever popular [Requests](https://2.python-requests.org/en/master/) library out of habit.
 However, since the data being accessed is not sequential in nature, I thought this would be a great opportunity to start exploring Python's concurrent capabilities with [asyncio](https://docs.python.org/3/library/asyncio.html).
 
 <br />
