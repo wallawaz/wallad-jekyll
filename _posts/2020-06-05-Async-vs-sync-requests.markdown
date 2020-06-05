@@ -5,7 +5,7 @@ date: 2020-06-04
 ---
 
 A current project I am working on requires obtaining data from similar companies within the same market for analysis.
-Since most of these entities do not provide an API, the only means I had to fetch the data was to scrape.
+Since most of these entities do not provide an API, the only means I had to fetch data was to build scrapers.
 
 While building these scrapers, I first went to the ever popular [Requests](https://2.python-requests.org/en/master/) library out of habbit.
 However, since the data being accessed is not sequential in nature, I thought this would be a great opportunity to start exploring Python's concurrent capabilities with [asyncio](https://docs.python.org/3/library/asyncio.html).
@@ -81,7 +81,7 @@ def main(fetch_type):
         asyncio.run(fetcher.async_main())
 ```
 
-The sequential example is straightforward:
+The sequential example is fairly straightforward:
 ```python
     # url_fetcher.py
     def seq_main(self):
@@ -95,8 +95,9 @@ The sequential example is straightforward:
             with requests.Session() as session:
                 responses.append(session.get(url))
                 self.url_times[url] = default_timer() - url_start
-```                
-<br>
+```
+
+
 
 The async example creates a task for each url by creating a `fetch` coroutine. Each fetch task is appended to `async_tasks`.
 ```python
@@ -153,8 +154,8 @@ ben@LAPTOP-8MSR27L7:~/repos/url-fetch-example$ poetry run url-fetch-example aioh
 ----------
 total time: 0.49253609997686
 ```
-Comparing the fetch times to each url, on average aiohttp was 0.192 seconds faster in fetching a ur
+Comparing the fetch times to each url, on average aiohttp was 0.192 seconds faster in fetching a url.
 <br>
-However, when comparing the **overall** runtime, aiohttp was **4.7x** faster than requests in fetching these five urls!
+However, when comparing the **overall** runtime, aiohttp fetched all urls **4.7x** faster than requests!
 <br>
 Moving forward, aiohttp will provide a huge performance boost when fetching multiple webpages simultaneously.
